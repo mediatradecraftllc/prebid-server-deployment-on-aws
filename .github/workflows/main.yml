@@ -30,7 +30,7 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@://github.com"
           
           # 2. Sync changes from the original AWS GitHub Repository
-          git remote add upstream https://github.com
+          git remote add upstream https://github.com/aws-solutions-library-samples/prebid-server-deployment-on-aws.git
           git fetch upstream main
           git checkout main
           git merge upstream/main --ff-only

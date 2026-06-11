@@ -1,42 +1,35 @@
-name: Sync AWS Prebid Fork
+name: Automated Fork Sync
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Runs automatically every day at midnight UTC
-  workflow_dispatch:
-    
+    - cron: '0 0 * * *' # Automatically triggers every night at midnight UTC
+  workflow_dispatch: # Keeps a manual override button just in case you ever want it
+
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  
+
 jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Grants permission to push updates back to your fork
+      contents: write # Allows the automated bot to update your code without your password
 
     steps:
       - name: Checkout Fork
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Fetches full history so git can safely merge
+          fetch-depth: 0
 
-      - name: Sync with Upstream
+      - name: Fetch and Merge AWS Updates
         run: |
-          # 1. Configure git credentials using the automatic runner identity
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@://github.com"
           
-          # 2. Add the original AWS repo as a remote source named 'upstream'
-          git remote add upstream https://github.com/aws-solutions-library-samples/prebid-server-deployment-on-aws.git
+          # Connects directly to the original AWS source repository
+          git remote add upstream https://github.com
           
-          # 3. Fetch the latest changes from the upstream repository
+          # Downloads and merges the updates automatically
           git fetch upstream main
-          
-          # 4. Switch to your fork's main branch
           git checkout main
-          
-          # 5. Merge upstream changes. --ff-only ensures it fails safely if you have local conflicts
           git merge upstream/main --ff-only
-          
-          # 6. Push the updated code back to your fork's repository on GitHub
           git push origin main

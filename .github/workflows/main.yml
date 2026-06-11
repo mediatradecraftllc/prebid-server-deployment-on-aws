@@ -3,8 +3,11 @@ name: Sync AWS Prebid Fork
 on:
   schedule:
     - cron: '0 0 * * *' # Runs automatically every day at midnight UTC
-  workflow_dispatch: # Allows manual triggers from the GitHub UI
-
+  workflow_dispatch:
+    
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  
 jobs:
   sync:
     runs-on: ubuntu-latest

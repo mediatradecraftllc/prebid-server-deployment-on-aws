@@ -1,0 +1,27 @@
+name: Sync AWS Prebid Fork
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs automatically every day at midnight UTC
+  workflow_dispatch: # Allows you to manually trigger this anytime from the GitHub UI
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to push the updates to your fork
+
+    steps:
+      - name: Checkout Fork
+        uses: actions/checkout@v4
+        with:
+          ref: main # Target branch in your fork
+
+      - name: Sync with AWS Upstream
+        uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
+        with:
+          target_sync_branch: main
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }} # Built-in GitHub token
+          upstream_repository: aws-solutions-library-samples/prebid-server-deployment-on-aws
+          upstream_sync_branch: main
+          test_mode: false # Set to true first if you want to test without saving changes

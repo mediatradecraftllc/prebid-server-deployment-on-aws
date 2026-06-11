@@ -1,9 +1,9 @@
-name: Automated Fork Sync
+name: Sync AWS Prebid to GitHub and Azure DevOps
 
 on:
   schedule:
-    - cron: '0 0 * * *' # Automatically triggers every night at midnight UTC
-  workflow_dispatch: # Keeps a manual override button just in case you ever want it
+    - cron: '0 0 * * *' # Runs automatically every day at midnight UTC
+  workflow_dispatch: # Allows manual triggers from the GitHub UI
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
@@ -12,7 +12,7 @@ jobs:
   sync:
     runs-on: ubuntu-latest
     permissions:
-      contents: write # Allows the automated bot to update your code without your password
+      contents: write
 
     steps:
       - name: Checkout Fork
@@ -20,16 +20,31 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Fetch and Merge AWS Updates
+      - name: Sync with AWS Upstream and Push to Azure DevOps via Headers
+        env:
+          AZURE_TOKEN: ${{ secrets.AZURE_DEVOPS_PAT }}
+          AZURE_URL: ${{ secrets.AZURE_REPO_URL }}
         run: |
+          # 1. Configure standard git credentials identity
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@://github.com"
           
-          # Connects directly to the original AWS source repository
-          git remote add upstream https://github.com/aws-solutions-library-samples/prebid-server-deployment-on-aws.git
-          
-          # Downloads and merges the updates automatically
+          # 2. Sync changes from the original AWS GitHub Repository
+          git remote add upstream https://github.com
           git fetch upstream main
           git checkout main
           git merge upstream/main --ff-only
           git push origin main
+          
+          # 3. Convert the token to a secure Base64 Basic Auth string
+          # Azure DevOps requires an empty username, so we format it as ":TOKEN"
+          B64_TOKEN=$(echo -n ":$AZURE_TOKEN" | base64 -w 0)
+          
+          # 4. Map the clean, un-authenticated Azure repo URL
+          git remote add azure "$AZURE_URL"
+          
+          # 5. Inject the token directly into the HTTP header configuration for the Azure remote
+          git config --local http.$AZURE_URL.extraHeader "Authorization: Basic $B64_TOKEN"
+          
+          # 6. Push the code securely to Azure DevOps
+          git push azure main --force

@@ -21,7 +21,7 @@ jobs:
         uses: aormsby/Fork-Sync-With-Upstream-action@v3.4.1
         with:
           target_sync_branch: main
-          target_repo_token: ${{ secrets.GITHUB_TOKEN }} # Built-in GitHub token
-          upstream_repository: aws-solutions-library-samples/prebid-server-deployment-on-aws
+          target_repo_token: ${{ secrets.GITHUB_TOKEN }}
+          upstream_sync_repo: aws-solutions-library-samples/prebid-server-deployment-on-aws
           upstream_sync_branch: main
-          test_mode: false # Set to true first if you want to test without saving changes
+          test_mode: false

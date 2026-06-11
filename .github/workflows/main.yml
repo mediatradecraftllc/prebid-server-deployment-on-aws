@@ -26,7 +26,7 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@://github.com"
           
           # Connects directly to the original AWS source repository
-          git remote add upstream https://github.com
+          git remote add upstream https://github.com/aws-solutions-library-samples/prebid-server-deployment-on-aws.git
           
           # Downloads and merges the updates automatically
           git fetch upstream main

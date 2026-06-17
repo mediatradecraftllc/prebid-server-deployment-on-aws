@@ -23,7 +23,7 @@ steps:
     git remote add upstream https://github.com/aws-solutions-library-samples/prebid-server-deployment-on-aws.git
     git fetch upstream main
 
-    BEHIND=$(git rev-list --count main..upstream/main)
+    BEHIND=$(git rev-list --count origin/main..upstream/main)
 
     if [ "$BEHIND" -eq 0 ]; then
       echo "##[section]Branch is up to date with upstream. No action needed."
@@ -31,6 +31,7 @@ steps:
     fi
 
     echo "##[section]Upstream has $BEHIND new commit(s). Syncing..."
+    git checkout main
     git merge upstream/main --ff-only
     git push origin main
   displayName: Sync from AWS upstream
